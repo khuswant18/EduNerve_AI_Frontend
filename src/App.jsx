@@ -1,0 +1,90 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { LearnerProvider } from "./context/LearnerContext"
+import PrivateRoute from "./components/PrivateRoute"
+import LandingPage from "./pages/LandingPage"
+import LoginPage from "./pages/LoginPage"
+import SignUpPage from "./pages/SignUpPage"
+import DashboardPage from "./pages/DashboardPage"
+import LmsHubPage from "./pages/LmsHubPage"
+import QuizHubPage from "./pages/QuizHubPage"
+import QuizPage from "./pages/QuizPage"
+import InterviewPage from "./pages/InterviewPage"
+import ProjectsPage from "./pages/ProjectsPage" 
+import NotFoundPage from "./pages/NotFoundPage"
+
+export default function App() {
+  return (
+    <LearnerProvider>
+      <BrowserRouter>
+        <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignUpPage />} />
+
+            {/* Protected Routes */}
+            <Route
+              path="/dashboard"
+              element={
+                <PrivateRoute>
+                  <DashboardPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/learning"
+              element={
+                <PrivateRoute>
+                  <LmsHubPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/lms"
+              element={
+                <PrivateRoute>
+                  <LmsHubPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/quizzes"
+              element={
+                <PrivateRoute>
+                  <QuizHubPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/quiz/:topic"
+              element={
+                <PrivateRoute>
+                  <QuizPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/interviews"
+              element={
+                <PrivateRoute>
+                  <InterviewPage />
+                </PrivateRoute>
+              }
+            />
+
+            {/* Projects placeholder */}
+            <Route
+              path="/projects"
+              element={
+                <PrivateRoute>
+                  <ProjectsPage />
+                </PrivateRoute>
+              }
+            />
+
+            <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </BrowserRouter>
+    </LearnerProvider>
+  )
+}
