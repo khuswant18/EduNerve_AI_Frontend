@@ -1,11 +1,12 @@
 import { useState } from "react"
-import { GraduationCap, Clock, TrendingUp, PlayCircle, CheckCircle2 } from "lucide-react"
+import { Link } from "react-router-dom"
+import { GraduationCap, Clock, TrendingUp, PlayCircle, CheckCircle2, Menu } from "lucide-react"
 
-import Navbar from "../components/layout/Navbar"
 import Button from "../components/common/Button"
 import Badge from "../components/common/Badge"
 import Progress from "../components/common/Progress"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../components/ui/card"
+import LearningSidebar from "../components/layout/LearningSidebar"
 
 const enrolledCourses = [
   {
@@ -72,13 +73,32 @@ const recommendedCourses = [
 
 export default function LmsHubPage() {
   const [activeTab, setActiveTab] = useState("enrolled")
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Navbar />
+      <LearningSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <div className="flex min-h-screen flex-col">
-        <main className="flex-1 px-4 py-10 sm:px-8 lg:px-12">
+      <div className="lg:ml-72 flex min-h-screen flex-col">
+        <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b border-border bg-card px-4 lg:px-8">
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="lg:hidden inline-flex items-center gap-2"
+              onClick={() => setSidebarOpen(true)}
+            >
+              <Menu className="h-4 w-4" />
+              Menu
+            </Button>
+            <div>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">Learn</p>
+              <h1 className="text-lg font-semibold text-foreground">Learning Hub</h1>
+            </div>
+          </div>
+        </header>
+
+        <main className="flex-1 px-4 py-8 sm:px-8 lg:px-12 lg:py-10">
           <div className="mx-auto w-full max-w-6xl">
             <div className="mb-12">
               <p className="text-sm font-semibold uppercase tracking-widest text-primary">Learn</p>
@@ -181,9 +201,11 @@ export default function LmsHubPage() {
                         <p>
                           Next lesson: <span className="text-foreground font-medium">{course.nextLesson}</span>
                         </p>
-                        <Button className="mt-4 w-full">
-                          <PlayCircle className="mr-2 h-4 w-4" /> Continue Learning
-                        </Button>
+                        <Link to="/learning/continue" className="mt-4 block">
+                          <Button className="w-full">
+                            <PlayCircle className="mr-2 h-4 w-4" /> Continue Learning
+                          </Button>
+                        </Link>
                       </div>
                     </CardContent>
                   </Card>

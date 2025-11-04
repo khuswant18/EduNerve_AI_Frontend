@@ -11,18 +11,17 @@ import QuizPage from "./pages/QuizPage"
 import InterviewPage from "./pages/InterviewPage"
 import ProjectsPage from "./pages/ProjectsPage" 
 import NotFoundPage from "./pages/NotFoundPage"
+import ContinueLearningPage from "./pages/ContinueLearningPage"
 
 export default function App() {
   return (
     <LearnerProvider>
       <BrowserRouter>
         <Routes>
-            {/* Public Routes */}
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUpPage />} />
 
-            {/* Protected Routes */}
             <Route
               path="/dashboard"
               element={
@@ -36,6 +35,14 @@ export default function App() {
               element={
                 <PrivateRoute>
                   <LmsHubPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/learning/continue"
+              element={
+                <PrivateRoute>
+                  <ContinueLearningPage />
                 </PrivateRoute>
               }
             />
@@ -72,7 +79,6 @@ export default function App() {
               }
             />
 
-            {/* Projects placeholder */}
             <Route
               path="/projects"
               element={

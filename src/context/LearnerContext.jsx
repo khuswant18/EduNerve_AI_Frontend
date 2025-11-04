@@ -71,15 +71,13 @@ export function LearnerProvider({ children }) {
             interviewsPracticed: user.interviews || [],
           }
           
-          // Cache profile data for offline access
           localStorage.setItem("cachedProfile", JSON.stringify(profileData))
           
           setIsAuthenticated(true)
           setLearnerProfile(profileData)
         } catch (error) {
-          console.error("❌ Auth check failed:", error)
+          console.error("Auth check failed:", error)
           
-          // Only clear session if token is invalid (401), not on server/network errors
           if (error.message?.includes('401') || error.message?.includes('Invalid token') || error.message?.includes('Token has expired')) {
             console.error("🔒 Token is invalid or expired - clearing session")
             localStorage.removeItem("authToken")
@@ -89,10 +87,8 @@ export function LearnerProvider({ children }) {
             setAuthUser(null)
             setLearnerProfile(null)
           } else {
-            // Server is down or network error - keep user logged in with cached data
             console.warn("⚠️ Server temporarily unavailable - keeping user session active")
             
-            // Try to load cached profile first
             const cachedProfile = localStorage.getItem("cachedProfile")
             
             if (cachedProfile) {
@@ -116,7 +112,6 @@ export function LearnerProvider({ children }) {
               setAuthUser(gUser)
               setIsAuthenticated(true)
               
-              // Set basic profile from cached Google user data
               setLearnerProfile({
                 id: gUser.id,
                 name: gUser.name,
@@ -128,8 +123,7 @@ export function LearnerProvider({ children }) {
                 quizAttempts: [],
                 interviewsPracticed: [],
               })
-            } else {
-              // For credential users, try to decode the JWT to get basic info
+            } else { 
               try {
                 const base64Url = token.split('.')[1]
                 const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
@@ -173,14 +167,13 @@ export function LearnerProvider({ children }) {
           }
         }
       } else if (googleUser) {
-        // If googleUser exists but no token, clear it and require re-login
-        console.warn("⚠️ Google user found but no auth token - clearing session")
+        console.warn("Google user found but no auth token - clearing session")
         localStorage.removeItem("googleUser")
         setIsAuthenticated(false)
         setAuthUser(null)
         setLearnerProfile(null)
       } else {
-        console.log("ℹ️ No authentication found - user needs to log in")
+        console.log("ℹNo authentication found - user needs to log in")
       }
       setLoading(false)
       console.log("🏁 Auth check complete:", { isAuthenticated: !!token })
@@ -211,7 +204,6 @@ export function LearnerProvider({ children }) {
         interviewsPracticed: [],
       }
       
-      // Cache profile data for offline access
       localStorage.setItem("cachedProfile", JSON.stringify(profileData))
       
       setIsAuthenticated(true)
@@ -254,7 +246,6 @@ export function LearnerProvider({ children }) {
         interviewsPracticed: [],
       }
       
-      // Cache profile data for offline access
       localStorage.setItem("cachedProfile", JSON.stringify(profileData))
       
       setIsAuthenticated(true)
@@ -296,12 +287,11 @@ export function LearnerProvider({ children }) {
         return { success: false, error: data.error || "Google authentication failed" }
       }
 
-      console.log("✅ Google login successful, saving token:", {
+      console.log("Google login successful, saving token:", {
         hasToken: !!data.token,
         tokenPreview: data.token?.substring(0, 20) + "..."
       })
 
-      // Save token from backend
       localStorage.setItem("authToken", data.token)
 
       const googleUser = {
@@ -315,7 +305,7 @@ export function LearnerProvider({ children }) {
 
       localStorage.setItem("googleUser", JSON.stringify(googleUser))
 
-      console.log("💾 Saved to localStorage:", {
+      console.log("Saved to localStorage:", {
         authToken: !!localStorage.getItem("authToken"),
         googleUser: !!localStorage.getItem("googleUser")
       })
@@ -332,7 +322,7 @@ export function LearnerProvider({ children }) {
         interviewsPracticed: [],
       }
       
-      // Cache profile data for offline access
+
       localStorage.setItem("cachedProfile", JSON.stringify(profileData))
       
       setIsAuthenticated(true)
