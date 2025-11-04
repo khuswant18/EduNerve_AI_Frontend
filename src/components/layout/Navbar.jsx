@@ -1,12 +1,10 @@
-import { Link, useNavigate, useLocation } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { useState, useRef, useEffect } from "react"
 import { useLearner } from "../../context/LearnerContext"
-import Button from "../common/Button"
 
 export default function Navbar() {
   const { isAuthenticated, learnerProfile, authUser, logout } = useLearner()
   const navigate = useNavigate()
-  const location = useLocation()
   const [showDropdown, setShowDropdown] = useState(false)
   const dropdownRef = useRef(null)
 
@@ -27,8 +25,6 @@ export default function Navbar() {
     navigate("/login")
   }
 
-  const isActive = (path) => location.pathname === path
-
   if (!isAuthenticated || !learnerProfile) {
     return null
   }
@@ -40,48 +36,7 @@ export default function Navbar() {
   return (
     <nav className="bg-card border-b border-border sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center gap-8">
-            <Link to="/dashboard" className="text-xl font-bold text-primary">
-              EduNerve AI
-            </Link>
-
-            <div className="hidden md:flex items-center gap-1">
-              <Link
-                to="/dashboard"
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive("/dashboard") ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-muted"
-                }`}
-              >
-                Dashboard
-              </Link>
-              <Link
-                to="/learning"
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive("/learning") ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-muted"
-                }`}
-              >
-                Learning
-              </Link>
-              <Link
-                to="/quizzes"
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive("/quizzes") ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-muted"
-                }`}
-              >
-                Quizzes
-              </Link>
-              <Link
-                to="/interviews"
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive("/interviews") ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-muted"
-                }`}
-              >
-                Interviews
-              </Link>
-            </div>
-          </div>
-
+        <div className="flex items-center justify-end h-16">
           <div className="flex items-center gap-4">
             <div className="relative" ref={dropdownRef}>
               <button

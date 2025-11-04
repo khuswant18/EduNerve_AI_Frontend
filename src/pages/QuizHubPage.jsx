@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react"
-import { BookOpen, Clock, Trophy, Filter, Menu } from "lucide-react"
+import { BookOpen, Clock, Trophy, Filter } from "lucide-react"
 
-import LearningSidebar from "../components/layout/LearningSidebar"
+import Navbar from "../components/layout/Navbar"
 import Button from "../components/common/Button"
 import Badge from "../components/common/Badge"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../components/ui/card"
@@ -79,7 +79,6 @@ const difficultyStyles = {
 }
 
 export default function QuizHubPage() {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
   const [selectedSubject, setSelectedSubject] = useState("All")
   const [selectedDifficulty, setSelectedDifficulty] = useState("All")
 
@@ -93,27 +92,12 @@ export default function QuizHubPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <LearningSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Navbar />
 
-      <div className="flex min-h-screen flex-col lg:pl-72">
-  <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border bg-background/95 px-4 py-4 backdrop-blur supports-backdrop-filter:bg-background/80 lg:hidden">
-          <button
-            type="button"
-            className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-border"
-            onClick={() => setSidebarOpen(true)}
-            aria-label="Open sidebar"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Assess</p>
-            <p className="text-base font-semibold">Interactive Quizzes</p>
-          </div>
-        </header>
-
+      <div className="flex min-h-screen flex-col">
         <main className="flex-1 px-4 py-10 sm:px-8 lg:px-12">
           <div className="mx-auto w-full max-w-6xl">
-            <div className="mb-12 hidden lg:block">
+            <div className="mb-12">
               <p className="text-sm font-semibold uppercase tracking-widest text-primary">Assess</p>
               <h1 className="mt-3 text-4xl font-bold sm:text-5xl">Interactive Quizzes</h1>
               <p className="mt-4 max-w-3xl text-lg leading-relaxed text-muted-foreground">

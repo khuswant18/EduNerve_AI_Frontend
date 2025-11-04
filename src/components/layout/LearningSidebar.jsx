@@ -1,13 +1,11 @@
 import { Link, useLocation } from "react-router-dom"
-import { LayoutDashboard, BookOpen, Trophy, Mic } from "lucide-react"
+import { LayoutDashboard, BookOpen } from "lucide-react"
 import { useLearner } from "../../context/LearnerContext"
 import Button from "../common/Button"
 
 const links = [
   { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
   { label: "Learning", to: "/lms", icon: BookOpen },
-  { label: "Quizzes", to: "/quizzes", icon: Trophy },
-  { label: "Interviews", to: "/interviews", icon: Mic },
 ] 
 
 export default function LearningSidebar({ open = false, onClose }) {
@@ -26,7 +24,7 @@ export default function LearningSidebar({ open = false, onClose }) {
 
   const handleLogout = () => {
     logout()
-    if (onClose) {
+    if (onClose) { 
       onClose()
     }
   }

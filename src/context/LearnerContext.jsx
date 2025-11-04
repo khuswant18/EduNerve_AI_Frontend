@@ -59,8 +59,7 @@ export function LearnerProvider({ children }) {
             })
           }
           
-          setIsAuthenticated(true)
-          setLearnerProfile({
+          const profileData = {
             id: user.id,
             name: user.name,
             email: user.email,
@@ -70,15 +69,108 @@ export function LearnerProvider({ children }) {
             skills: user.skills || [],
             quizAttempts: user.quizResults || [],
             interviewsPracticed: user.interviews || [],
-          })
+          }
+          
+          // Cache profile data for offline access
+          localStorage.setItem("cachedProfile", JSON.stringify(profileData))
+          
+          setIsAuthenticated(true)
+          setLearnerProfile(profileData)
         } catch (error) {
           console.error("❌ Auth check failed:", error)
-          console.error("Clearing authentication data")
-          localStorage.removeItem("authToken")
-          localStorage.removeItem("googleUser")
-          setIsAuthenticated(false)
-          setAuthUser(null)
-          setLearnerProfile(null)
+          
+          // Only clear session if token is invalid (401), not on server/network errors
+          if (error.message?.includes('401') || error.message?.includes('Invalid token') || error.message?.includes('Token has expired')) {
+            console.error("🔒 Token is invalid or expired - clearing session")
+            localStorage.removeItem("authToken")
+            localStorage.removeItem("googleUser")
+            localStorage.removeItem("cachedProfile")
+            setIsAuthenticated(false)
+            setAuthUser(null)
+            setLearnerProfile(null)
+          } else {
+            // Server is down or network error - keep user logged in with cached data
+            console.warn("⚠️ Server temporarily unavailable - keeping user session active")
+            
+            // Try to load cached profile first
+            const cachedProfile = localStorage.getItem("cachedProfile")
+            
+            if (cachedProfile) {
+              const profile = JSON.parse(cachedProfile)
+              setLearnerProfile(profile)
+              setIsAuthenticated(true)
+              
+              if (googleUser) {
+                const gUser = JSON.parse(googleUser)
+                setAuthUser(gUser)
+              } else {
+                setAuthUser({
+                  provider: "credentials",
+                  email: profile.email,
+                  name: profile.name,
+                  picture: null,
+                })
+              }
+            } else if (googleUser) {
+              const gUser = JSON.parse(googleUser)
+              setAuthUser(gUser)
+              setIsAuthenticated(true)
+              
+              // Set basic profile from cached Google user data
+              setLearnerProfile({
+                id: gUser.id,
+                name: gUser.name,
+                email: gUser.email,
+                avatar: gUser.picture,
+                role: null,
+                experience: null,
+                skills: [],
+                quizAttempts: [],
+                interviewsPracticed: [],
+              })
+            } else {
+              // For credential users, try to decode the JWT to get basic info
+              try {
+                const base64Url = token.split('.')[1]
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+                const jsonPayload = decodeURIComponent(
+                  atob(base64)
+                    .split('')
+                    .map((c) => `%${('00' + c.charCodeAt(0).toString(16)).slice(-2)}`)
+                    .join('')
+                )
+                const decoded = JSON.parse(jsonPayload)
+                
+                setAuthUser({
+                  provider: "credentials",
+                  email: decoded.email,
+                  name: decoded.name || "User",
+                  picture: null,
+                })
+                setIsAuthenticated(true)
+                setLearnerProfile({
+                  id: decoded.userId,
+                  name: decoded.name || "User",
+                  email: decoded.email,
+                  avatar: null,
+                  role: null,
+                  experience: null,
+                  skills: [],
+                  quizAttempts: [],
+                  interviewsPracticed: [],
+                })
+              } catch (decodeError) {
+                console.error("Failed to decode token:", decodeError)
+                // If we can't decode the token, clear the session
+                localStorage.removeItem("authToken")
+                localStorage.removeItem("googleUser")
+                localStorage.removeItem("cachedProfile")
+                setIsAuthenticated(false)
+                setAuthUser(null)
+                setLearnerProfile(null)
+              }
+            }
+          }
         }
       } else if (googleUser) {
         // If googleUser exists but no token, clear it and require re-login
@@ -101,14 +193,14 @@ export function LearnerProvider({ children }) {
       const response = await authAPI.login(email, password)
       localStorage.setItem("authToken", response.token)
       
-      setIsAuthenticated(true)
-      setAuthUser({
+      const authUserData = {
         provider: "credentials",
         email: response.user.email,
         name: response.user.name,
         picture: null,
-      })
-      setLearnerProfile({
+      }
+      
+      const profileData = {
         id: response.user.id,
         name: response.user.name,
         email: response.user.email,
@@ -117,7 +209,14 @@ export function LearnerProvider({ children }) {
         skills: response.user.skills || [],
         quizAttempts: [],
         interviewsPracticed: [],
-      })
+      }
+      
+      // Cache profile data for offline access
+      localStorage.setItem("cachedProfile", JSON.stringify(profileData))
+      
+      setIsAuthenticated(true)
+      setAuthUser(authUserData)
+      setLearnerProfile(profileData)
       
       return { success: true }
     } catch (error) {
@@ -137,14 +236,14 @@ export function LearnerProvider({ children }) {
       const savedToken = localStorage.getItem("authToken")
       console.log("Token saved successfully:", !!savedToken)
       
-      setIsAuthenticated(true)
-      setAuthUser({
+      const authUserData = {
         provider: "credentials",
         email: response.user.email,
         name: response.user.name,
         picture: null,
-      })
-      setLearnerProfile({
+      }
+      
+      const profileData = {
         id: response.user.id,
         name: response.user.name,
         email: response.user.email,
@@ -153,7 +252,14 @@ export function LearnerProvider({ children }) {
         skills: response.user.skills || [],
         quizAttempts: [],
         interviewsPracticed: [],
-      })
+      }
+      
+      // Cache profile data for offline access
+      localStorage.setItem("cachedProfile", JSON.stringify(profileData))
+      
+      setIsAuthenticated(true)
+      setAuthUser(authUserData)
+      setLearnerProfile(profileData)
       
       return { success: true }
     } catch (error) {
@@ -170,7 +276,8 @@ export function LearnerProvider({ children }) {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/api/auth/google", {
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+      const response = await fetch(`${API_URL}/auth/google`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -213,10 +320,7 @@ export function LearnerProvider({ children }) {
         googleUser: !!localStorage.getItem("googleUser")
       })
 
-      setIsAuthenticated(true)
-      setAuthUser(googleUser)
-      
-      setLearnerProfile({
+      const profileData = {
         id: data.user.id,
         name: data.user.name,
         email: data.user.email,
@@ -226,7 +330,14 @@ export function LearnerProvider({ children }) {
         skills: data.user.skills || [],
         quizAttempts: [],
         interviewsPracticed: [],
-      })
+      }
+      
+      // Cache profile data for offline access
+      localStorage.setItem("cachedProfile", JSON.stringify(profileData))
+      
+      setIsAuthenticated(true)
+      setAuthUser(googleUser)
+      setLearnerProfile(profileData)
 
       return { 
         success: true, 
@@ -241,6 +352,7 @@ export function LearnerProvider({ children }) {
   const logout = () => {
     localStorage.removeItem("authToken")
     localStorage.removeItem("googleUser")
+    localStorage.removeItem("cachedProfile")
     setIsAuthenticated(false)
     setAuthUser(null)
     setLearnerProfile(null)

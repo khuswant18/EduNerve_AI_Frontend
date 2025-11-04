@@ -213,15 +213,16 @@ function Interview() {
         tokenPreview: token?.substring(0, 20) + "...",
         allLocalStorage: Object.keys(localStorage),
       });
-
+ 
       if (!token) {
         setStatus("Authentication token not found. Please log in again.");
-        setIsLoading(false);
-        return;
+        setIsLoading(false);   
+        return; 
       }
 
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
       const res = await fetch(
-        "http://localhost:3000/api/interview/start-interview",
+        `${API_URL}/interview/start-interview`,
         {
           method: "POST",
           headers: {
@@ -387,8 +388,9 @@ function Interview() {
     if (interviewId && transcript.length > 0) {
       try {
         setStatus("Saving interview data and generating feedback...");
+        const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
         const response = await fetch(
-          "http://localhost:3000/api/interview/complete",
+          `${API_URL}/interview/complete`,
           {
             method: "POST",
             headers: {

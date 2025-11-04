@@ -26,7 +26,8 @@ function QuizTest() {
       setLoading(true);
       const prompt = `${category} - ${subtopics.join(", ")}`;
       
-      const response = await fetch("http://localhost:3000/api/quiz/generate", {
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+      const response = await fetch(`${API_URL}/quiz/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
@@ -72,7 +73,7 @@ function QuizTest() {
   };
 
   const handleSubmit = async () => {
-    // Calculate score
+
     let correctCount = 0;
     questions.forEach((q, index) => {
       if (selectedAnswers[index] === q.answer) {
@@ -90,7 +91,8 @@ function QuizTest() {
       else if (percentage >= 40) level = "Beginner";
       else level = "Needs Improvement";
 
-      await fetch("http://localhost:3000/api/quiz/result", {
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+      await fetch(`${API_URL}/quiz/result`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
