@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useLearner } from "../context/LearnerContext";
 
 function QuizTest() {
   const location = useLocation();
   const navigate = useNavigate();
   const { category, subtopics } = location.state || {};
+  const { refreshProfile } = useLearner();
 
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -92,9 +94,14 @@ function QuizTest() {
       else level = "Needs Improvement";
 
       const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
-      await fetch(`${API_URL}/quiz/result`, {
+      const token = localStorage.getItem("authToken");
+      
+      const response = await fetch(`${API_URL}/quiz/result`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify({
           category,
           subtopics,
@@ -104,8 +111,17 @@ function QuizTest() {
           level
         }),
       });
+
+      const data = await response.json();
+
+      if (data.success) {
+        await refreshProfile() // Refresh profile to update dashboard
+        navigate(`/quiz-result`, { state: { result: data.data } })
+      } else {
+        console.error("Failed to save quiz result")
+      }
     } catch (error) {
-      console.error("Error saving result:", error);
+      console.error("Error saving quiz result:", error)
     }
 
     setShowResult(true);

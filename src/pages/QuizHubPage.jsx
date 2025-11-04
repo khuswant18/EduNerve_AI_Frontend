@@ -1,76 +1,38 @@
 import { useMemo, useState } from "react"
+import { Link } from "react-router-dom"
 import { BookOpen, Clock, Trophy, Filter } from "lucide-react"
 
 import Navbar from "../components/layout/Navbar"
 import Button from "../components/common/Button"
 import Badge from "../components/common/Badge"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../components/ui/card"
+import { content } from "../data/mockData"
 
-const quizzes = [
-  {
-    id: 1,
-    title: "JavaScript Fundamentals",
-    description: "Test your knowledge of core JavaScript concepts including variables, functions, and scope.",
-    subject: "Programming",
-    difficulty: "Beginner",
-    questions: 20,
-    duration: "30 min",
-    completions: 1234,
-  },
-  {
-    id: 2,
-    title: "React Advanced Patterns",
-    description: "Deep dive into advanced React patterns, hooks, and performance optimization techniques.",
-    subject: "Programming",
-    difficulty: "Advanced",
-    questions: 25,
-    duration: "45 min",
-    completions: 567,
-  },
-  {
-    id: 3,
-    title: "Data Structures & Algorithms",
-    description: "Master essential data structures and algorithmic problem-solving techniques.",
-    subject: "Computer Science",
-    difficulty: "Intermediate",
-    questions: 30,
-    duration: "60 min",
-    completions: 890,
-  },
-  {
-    id: 4,
-    title: "System Design Basics",
-    description: "Learn fundamental concepts of distributed systems and scalable architecture.",
-    subject: "System Design",
-    difficulty: "Intermediate",
-    questions: 15,
-    duration: "40 min",
-    completions: 456,
-  },
-  {
-    id: 5,
-    title: "TypeScript Essentials",
-    description: "Understand TypeScript type system, interfaces, and advanced type features.",
-    subject: "Programming",
-    difficulty: "Beginner",
-    questions: 18,
-    duration: "35 min",
-    completions: 789,
-  },
-  {
-    id: 6,
-    title: "Database Design Principles",
-    description: "Explore relational database design, normalization, and query optimization.",
-    subject: "Database",
-    difficulty: "Intermediate",
-    questions: 22,
-    duration: "50 min",
-    completions: 345,
-  },
-]
+const topicMetadata = {
+  "Data Structures": { subject: "Computer Science", difficulty: "Intermediate" },
+  Algorithms: { subject: "Computer Science", difficulty: "Advanced" },
+  "System Design": { subject: "System Design", difficulty: "Intermediate" },
+  "Machine Learning": { subject: "Artificial Intelligence", difficulty: "Advanced" },
+}
 
-const subjects = ["All", "Programming", "Computer Science", "System Design", "Database"]
-const difficulties = ["All", "Beginner", "Intermediate", "Advanced"]
+const buildQuizzes = () => {
+  return Object.entries(content).map(([topicKey, topicData]) => {
+    const meta = topicMetadata[topicKey] || { subject: "General", difficulty: "Intermediate" }
+    const questionCount = topicData?.quiz?.questions?.length || 0
+
+    return {
+      id: topicKey,
+      topicKey,
+      title: topicData?.quiz?.title || `${topicKey} Quiz`,
+      description: topicData?.lms?.description || `Test your understanding of ${topicKey}.`,
+      subject: meta.subject,
+      difficulty: meta.difficulty,
+      questions: questionCount,
+      duration: `${Math.max(questionCount * 2, 5)} min`,
+      completions: 250 + questionCount * 42,
+    }
+  })
+}
 
 const difficultyStyles = {
   Beginner: "bg-green-500/10 text-green-500 border-green-500/20",
@@ -78,9 +40,21 @@ const difficultyStyles = {
   Advanced: "bg-red-500/10 text-red-500 border-red-500/20",
 }
 
+const quizzes = buildQuizzes()
+
 export default function QuizHubPage() {
   const [selectedSubject, setSelectedSubject] = useState("All")
   const [selectedDifficulty, setSelectedDifficulty] = useState("All")
+
+  const subjects = useMemo(() => {
+    const uniqueSubjects = new Set(quizzes.map((quiz) => quiz.subject))
+    return ["All", ...uniqueSubjects]
+  }, [])
+
+  const difficulties = useMemo(() => {
+    const uniqueDifficulties = new Set(quizzes.map((quiz) => quiz.difficulty))
+    return ["All", ...uniqueDifficulties]
+  }, [])
 
   const filteredQuizzes = useMemo(() => {
     return quizzes.filter((quiz) => {
@@ -88,7 +62,7 @@ export default function QuizHubPage() {
       const difficultyMatch = selectedDifficulty === "All" || quiz.difficulty === selectedDifficulty
       return subjectMatch && difficultyMatch
     })
-  }, [selectedSubject, selectedDifficulty])
+  }, [selectedDifficulty, selectedSubject])
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -181,9 +155,11 @@ export default function QuizHubPage() {
                         <Trophy className="h-4 w-4" />
                         {quiz.completions.toLocaleString()} completions
                       </div>
-                      <Button className="w-full" variant="primary">
-                        Start Quiz
-                      </Button>
+                      <Link to={`/quiz/${encodeURIComponent(quiz.topicKey)}`} className="w-full">
+                        <Button className="w-full" variant="primary">
+                          Start Quiz
+                        </Button>
+                      </Link>
                     </CardContent>
                   </Card>
                 ))}

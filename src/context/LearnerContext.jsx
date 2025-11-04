@@ -428,6 +428,30 @@ export function LearnerProvider({ children }) {
     })
   }
 
+  const refreshProfile = async () => {
+    try {
+      const token = localStorage.getItem("authToken")
+      if (!token) return
+
+      const response = await authAPI.getProfile()
+      const user = response.success ? response.user : response
+      
+      setLearnerProfile({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+        role: user.role,
+        experience: user.experience,
+        skills: user.skills || [],
+        quizAttempts: user.quizResults || [],
+        interviewsPracticed: user.interviews || [],
+      })
+    } catch (error) {
+      console.error("Error refreshing profile:", error)
+    }
+  }
+
   const value = {
     isAuthenticated,
     authUser,
@@ -440,6 +464,7 @@ export function LearnerProvider({ children }) {
     setProfile,
     completeQuiz,
     saveInterviewResult,
+    refreshProfile,
   }
 
   return <LearnerContext.Provider value={value}>{children}</LearnerContext.Provider>
