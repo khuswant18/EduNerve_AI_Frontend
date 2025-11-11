@@ -82,22 +82,6 @@ export const interviewAPI = {
 }
 
 
-export const quizAPI = {
-  generateQuiz: async (topic, difficulty, numberOfQuestions) => {
-    return fetchWithAuth(`${API_URL}/quiz/generate-quiz`, {
-      method: "POST",
-      body: JSON.stringify({ topic, difficulty, numberOfQuestions }),
-    })
-  },
-
-  saveQuizResult: async (data) => {
-    return fetchWithAuth(`${API_URL}/quiz/save-quiz-result`, {
-      method: "POST",
-      body: JSON.stringify(data),
-    })
-  },
-}
-
 export const resourcesAPI = {
   getResources: async (params = {}) => {
     const queryString = new URLSearchParams(params).toString()
@@ -119,6 +103,5 @@ export const resourcesAPI = {
 export default {
   authAPI,
   interviewAPI,
-  quizAPI,
   resourcesAPI,
 }

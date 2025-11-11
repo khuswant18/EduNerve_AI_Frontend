@@ -119,7 +119,7 @@ export default function LandingPage() {
               <span className="text-primary">intelligent learning</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Comprehensive platform for quizzes, interview preparation, and
+              Comprehensive platform for interview preparation and
               structured learning paths. Everything you need to succeed in one
               place.
             </p>
@@ -130,13 +130,6 @@ export default function LandingPage() {
               >
                 {isAuthenticated ? 'Go to Dashboard' : 'Get Started Free'}
                 {/* <ArrowRight className="ml-2 h-4 w-4" /> */}
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={() => navigate('/quizzes')}
-              >
-                Try a Quiz
               </Button>
             </div>
           </div> 
@@ -203,34 +196,32 @@ export default function LandingPage() {
                 <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
                   <BookOpen className="h-6 w-6 text-primary" />
                 </div>
-                <CardTitle className="text-2xl">Interactive Quizzes</CardTitle>
+                <CardTitle className="text-2xl">Learning Resources</CardTitle>
                 <CardDescription className="text-base leading-relaxed">
-                  Test your knowledge with adaptive quizzes across multiple
-                  subjects and difficulty levels.
+                  Access comprehensive learning materials and structured courses
+                  to build your technical skills.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 mb-6">
                   <li className="flex items-center gap-2 text-sm text-muted-foreground">
                     <CheckCircle2 className="h-4 w-4 text-primary" />
-                    Multiple subjects available
+                    Curated learning paths
                   </li>
                   <li className="flex items-center gap-2 text-sm text-muted-foreground">
                     <CheckCircle2 className="h-4 w-4 text-primary" />
-                    Adaptive difficulty levels
+                    Interactive tutorials
                   </li>
                   <li className="flex items-center gap-2 text-sm text-muted-foreground">
                     <CheckCircle2 className="h-4 w-4 text-primary" />
-                    Instant feedback & scoring
+                    Progress tracking
                   </li>
                 </ul>
                 <Button
-                  // variant="ghost"
                   className="w-full bg-primary text-primary-foreground"
-                  onClick={() => navigate(isAuthenticated ? '/quizzes' : '/signup')}
+                  onClick={() => navigate(isAuthenticated ? '/lms' : '/signup')}
                 >
-                  {isAuthenticated ? 'Start Quiz' : 'View More'}
-                  {/* <ArrowRight className="ml-2 h-4 w-4" /> */}
+                  {isAuthenticated ? 'Start Learning' : 'View More'}
                 </Button>
               </CardContent>
             </Card>

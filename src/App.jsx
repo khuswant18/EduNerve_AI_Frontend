@@ -6,8 +6,6 @@ import LoginPage from "./pages/LoginPage"
 import SignUpPage from "./pages/SignUpPage"
 import DashboardPage from "./pages/DashboardPage"
 import LmsHubPage from "./pages/LmsHubPage"
-import QuizHubPage from "./pages/QuizHubPage"
-import QuizPage from "./pages/QuizPage"
 import InterviewPage from "./pages/InterviewPage"
 import ProjectsPage from "./pages/ProjectsPage" 
 import NotFoundPage from "./pages/NotFoundPage"
@@ -51,22 +49,6 @@ export default function App() {
               element={
                 <PrivateRoute>
                   <LmsHubPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/quizzes"
-              element={
-                <PrivateRoute>
-                  <QuizHubPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/quiz/:topic"
-              element={
-                <PrivateRoute>
-                  <QuizPage />
                 </PrivateRoute>
               }
             />

@@ -5,11 +5,6 @@ export default function StatsOverview() {
 
   const stats = [
     {
-      label: "Quizzes Taken",
-      value: learnerProfile?.quizAttempts?.length || 0,
-      icon: "📝",
-    },
-    {
       label: "Interviews Practiced",
       value: learnerProfile?.interviewsPracticed?.length || 0,
       icon: "🎤",
@@ -20,13 +15,9 @@ export default function StatsOverview() {
       icon: "✅",
     },
     {
-      label: "Average Quiz Score",
-      value: learnerProfile?.quizAttempts?.length
-        ? Math.round(
-            learnerProfile.quizAttempts.reduce((acc, curr) => acc + curr.score, 0) / learnerProfile.quizAttempts.length,
-          ) + "%"
-        : "N/A",
-      icon: "📊",
+      label: "Skills Learned",
+      value: learnerProfile?.skills?.length || 0,
+      icon: "�️",
     },
   ]
 

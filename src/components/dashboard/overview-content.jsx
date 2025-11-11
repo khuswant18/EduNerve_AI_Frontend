@@ -19,8 +19,6 @@ import { TrendingUp, Award, BookOpen, MessageSquare } from "lucide-react"
 export function OverviewContent() {
   const { learnerProfile } = useLearner()
   const [stats, setStats] = useState({
-    totalQuizzes: 0,
-    avgScore: 0,
     totalInterviews: 0,
     completedInterviews: 0,
   })
@@ -35,46 +33,29 @@ export function OverviewContent() {
 
   useEffect(() => {
     if (learnerProfile) {
-      const quizzes = learnerProfile.quizAttempts || []
       const interviews = learnerProfile.interviewsPracticed || []
-      
-      const totalQuizzes = quizzes.length
-      const avgScore = totalQuizzes > 0
-        ? quizzes.reduce((sum, q) => sum + (q.percentage || 0), 0) / totalQuizzes
-        : 0
       
       const totalInterviews = interviews.length
       const completedInterviews = interviews.filter(i => i.status === "completed").length
 
       setStats({
-        totalQuizzes,
-        avgScore: Math.round(avgScore * 10) / 10,
         totalInterviews,
         completedInterviews,
       })
     }
   }, [learnerProfile])
 
-  // Prepare quiz chart data
-  const quizChartData = (learnerProfile?.quizAttempts || [])
-    .slice(-6)
-    .map((quiz, index) => ({
-      name: `Quiz ${index + 1}`,
-      score: quiz.percentage || 0,
-      total: 100,
-    }))
-
   // Prepare skills chart data
   const skillsChartData = (learnerProfile?.skills || [])
     .slice(0, 5)
     .map((skill) => ({
       skill,
-      progress: 75, // Default progress since we don't track individual skill progress yet
+      progress: 75,
     }))
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-foreground">
           Welcome back, {learnerProfile?.name || "Learner"}!
@@ -84,32 +65,32 @@ export function OverviewContent() {
         </p>
       </div>
 
-      {/* Stats Cards */}
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Quiz Attempts</CardTitle>
+            <CardTitle className="text-sm font-medium">Skills Mastered</CardTitle>
             <Award className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">{stats.totalQuizzes}</div>
+            <div className="text-2xl font-bold text-foreground">{learnerProfile?.skills?.length || 0}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              Keep practicing to improve!
+              Technical skills tracked
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Average Score</CardTitle>
+            <CardTitle className="text-sm font-medium">Interview Success</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-foreground">
-              {stats.avgScore > 0 ? `${stats.avgScore}%` : "N/A"}
+              {stats.totalInterviews > 0 ? `${Math.round((stats.completedInterviews / stats.totalInterviews) * 100)}%` : "N/A"}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {stats.totalQuizzes > 0 ? "Great progress!" : "Take a quiz to get started"}
+              {stats.totalInterviews > 0 ? "Completion rate" : "Start practicing interviews"}
             </p>
           </CardContent>
         </Card>
@@ -143,44 +124,10 @@ export function OverviewContent() {
         </Card>
       </div>
 
-      {/* Charts */}
-      {(stats.totalQuizzes > 0 || (learnerProfile?.skills?.length || 0) > 0) && (
-        <div className="grid gap-6 lg:grid-cols-2">
-          {/* Quiz Performance Chart */}
-          {stats.totalQuizzes > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Quiz Performance</CardTitle>
-                <CardDescription>Your last {quizChartData.length} quiz attempts</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={quizChartData}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                    <XAxis dataKey="name" className="text-xs" />
-                    <YAxis domain={[0, 100]} className="text-xs" />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "hsl(var(--card))",
-                        border: "1px solid hsl(var(--border))",
-                        borderRadius: "8px",
-                      }}
-                    />
-                    <Legend />
-                    <Line
-                      type="monotone"
-                      dataKey="score"
-                      stroke="hsl(var(--primary))"
-                      strokeWidth={2}
-                      name="Score %"
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          )}
 
-          {/* Skills Progress Chart */}
+      {(learnerProfile?.skills?.length || 0) > 0 && (
+        <div className="grid gap-6 lg:grid-cols-2">
+
           {(learnerProfile?.skills?.length || 0) > 0 && (
             <Card>
               <CardHeader>
@@ -209,7 +156,7 @@ export function OverviewContent() {
         </div>
       )}
 
-      {/* Recent Interview Feedback */}
+
       {stats.completedInterviews > 0 && (
         <Card>
           <CardHeader>
@@ -281,8 +228,8 @@ export function OverviewContent() {
         </Card>
       )}
 
-      {/* Empty State */}
-      {stats.totalQuizzes === 0 && stats.totalInterviews === 0 && (
+
+      {stats.totalInterviews === 0 && (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <BookOpen className="h-16 w-16 text-muted-foreground mb-4" />
@@ -290,7 +237,7 @@ export function OverviewContent() {
               Ready to start your learning journey?
             </h3>
             <p className="text-muted-foreground text-center max-w-md">
-              Take a quiz or practice an interview to get personalized feedback and track your progress.
+              Practice an interview to get personalized feedback and track your progress.
             </p>
           </CardContent>
         </Card>
